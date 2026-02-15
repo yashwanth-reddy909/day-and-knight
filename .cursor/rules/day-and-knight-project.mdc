@@ -1,0 +1,22 @@
+---
+description: Day and Knight VS Code extension - project context and conventions
+alwaysApply: true
+---
+
+# Day and Knight Extension
+
+## Project Summary
+
+VS Code extension that auto-switches themes based on **local time** (day vs night). Differentiator: supports **arrays of themes** with random assignment, rather than single `workbench.preferredLightColorTheme` / `workbench.preferredDarkColorTheme`.
+
+## Key Conventions
+
+- **Config keys**: `day-and-knight.light-themes: []` and `day-and-knight.dark-themes: []` — we own these, not workbench.*
+- **Theme application**: Extension directly updates `workbench.colorTheme` (and related workbench settings)
+- **Requirement**: `window.autoDetectColorScheme: false` — otherwise VS Code's built-in OS-based switching conflicts with our time-based logic
+- **Status bar**: Provides quick toggle between day/night themes
+- **Tech**: TypeScript, VS Code extension API
+
+## Reference
+
+Similar extension: [vscode-sundial](https://github.com/muuvmuuv/vscode-sundial) — we differ by supporting theme arrays + random selection.
