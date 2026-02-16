@@ -1,6 +1,6 @@
-# vscode-day-and-knight README
+# day-and-knight README
 
-This is the README for your extension "vscode-day-and-knight". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "day-and-knight". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
