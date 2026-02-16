@@ -1,6 +1,6 @@
 {
-  "name": "vscode-day-and-knight",
-  "displayName": "vscode-day-and-knight",
+  "name": "day-and-knight",
+  "displayName": "day-and-knight",
   "description": "Automatically switch to dark mode at sunset",
   "version": "0.0.1",
   "engines": {
@@ -14,11 +14,11 @@
   "contributes": {
     "commands": [
       {
-        "command": "vscode-day-and-knight.helloWorld",
+        "command": "day-and-knight.helloWorld",
         "title": "Hello World"
       },
       {
-        "command": "vscode-day-and-knight.toggle",
+        "command": "day-and-knight.toggle",
         "title": "Toggle"
       }
     ]

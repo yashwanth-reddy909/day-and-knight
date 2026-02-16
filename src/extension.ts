@@ -13,20 +13,20 @@ export function activate(context: vscode.ExtensionContext) {
 	/**
 	 * sample success message
 	 */
-	console.log('Congratulations, your extension "vscode-day-and-knight" is now active!');
+	console.log('Congratulations, your extension "day-and-knight" is now active!');
 
 	/**
 	 * sample hello world command
 	 */
-	const disposable = vscode.commands.registerCommand('vscode-day-and-knight.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello from vscode-day-and-knight!');
+	const disposable = vscode.commands.registerCommand('day-and-knight.helloWorld', () => {
+		vscode.window.showInformationMessage('Hello from day-and-knight!');
 	});
 	context.subscriptions.push(disposable);
 
 	/**
 	 * toggle command for the status bar item
 	 */
-	const toggleCommandId = 'vscode-day-and-knight.toggle';
+	const toggleCommandId = 'day-and-knight.toggle';
 	const toggleCommand = vscode.commands.registerCommand(toggleCommandId, toggleTheme);
 	context.subscriptions.push(toggleCommand);
 
