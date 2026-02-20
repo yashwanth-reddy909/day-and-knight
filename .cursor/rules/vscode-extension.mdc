@@ -1,0 +1,14 @@
+---
+description: Day and Knight VS Code extension context and coding conventions
+alwaysApply: true
+---
+
+# Day and Knight - Core Rule
+
+- Build only a VS Code extension. Do not introduce frontend app/server guidance.
+- Focus entry point: `src/extension.ts`.
+- Use `day-and-knight.light-themes` and `day-and-knight.dark-themes` as source of truth.
+- Do not use `workbench.preferredLightColorTheme` or `workbench.preferredDarkColorTheme` for inputs.
+- Write selected theme to `workbench.colorTheme`.
+- Require `window.autoDetectColorScheme: false` to avoid OS-based conflicts.
+- Keep changes small, local, and TypeScript-first.
