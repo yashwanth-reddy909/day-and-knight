@@ -8,5 +8,5 @@ alwaysApply: true
 - Prefer explicit, strict types; avoid `any` unless unavoidable.
 - Replace magic values with named constants when reused or non-obvious.
 - Keep functions single-purpose; extract repeated logic.
-- Use comments only for intent/constraints, not obvious behavior.
+- Use comments for better understanding, not to explain bad code.
 - Do not swallow errors; handle or report them clearly.

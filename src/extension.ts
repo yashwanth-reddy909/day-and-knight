@@ -1,62 +1,96 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import { countReset } from 'console';
 import * as vscode from 'vscode';
-
+import { ConfigModel, type ThemeConfig } from './models/config-model';
+import { hashDayToIndex, getLocalDayKey } from './util';
 
 let statusBarItem: vscode.StatusBarItem;
+type ThemeMode = 'day' | 'night';
+const configModel = new ConfigModel();
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+// Local hour when day mode starts (inclusive).
+const DAY_START_HOUR = 6;
+// Local hour when night mode starts (exclusive upper bound for day).
+const NIGHT_START_HOUR = 18;
 
-	/**
-	 * sample success message
-	 */
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
 	console.log('Congratulations, your extension "day-and-knight" is now active!');
 
-	/**
-	 * sample hello world command
-	 */
 	const disposable = vscode.commands.registerCommand('day-and-knight.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello from day-and-knight!');
 	});
 	context.subscriptions.push(disposable);
 
-	/**
-	 * toggle command for the status bar item
-	 */
 	const toggleCommandId = 'day-and-knight.toggle';
-	const toggleCommand = vscode.commands.registerCommand(toggleCommandId, toggleTheme);
+	const toggleCommand = vscode.commands.registerCommand(toggleCommandId, async () => {
+		await toggleTheme();
+	});
 	context.subscriptions.push(toggleCommand);
 
-	/**
-	 * create a status bar item
-	*/
 	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Number.MIN_SAFE_INTEGER);
-	// TODO: custom logo for the status bar item
-	statusBarItem.text = `$(light-bulb) Day and Knight`;
+	statusBarItem.text = '$(light-bulb) Day and Knight';
 	statusBarItem.command = toggleCommandId;
-	// TODO: this should show when hovering over the status bar item "Is it a day already?" or "Is it a knight already?" based on the theme/time of day
-	statusBarItem.tooltip = 'Is it a day already?';
+	statusBarItem.tooltip = 'Toggle between day and night themes';
 	statusBarItem.show();
 	context.subscriptions.push(statusBarItem);
+
+	await applyThemeForMode(getModeForNow(new Date()));
 }
 
-function toggleTheme() {
-	const lightTheme = "Default Light+";
-	const darkTheme = "Default Dark+";
+// Switch between day/night theme using on status bar click.
+async function toggleTheme(): Promise<void> {
+	const config = configModel.getThemeConfig();
+	const currentTheme = configModel.getCurrentTheme();
 
-	if (vscode.workspace.getConfiguration('workbench').get('colorTheme') === lightTheme) {
-		vscode.workspace.getConfiguration('workbench').update('colorTheme', darkTheme);
-	} else if (vscode.workspace.getConfiguration('workbench').get('colorTheme') === darkTheme) {
-		vscode.workspace.getConfiguration('workbench').update('colorTheme', lightTheme);
+	let nextMode: ThemeMode;
+	if (config.lightThemes.includes(currentTheme)) {
+		nextMode = 'night';
+	} else if (config.darkThemes.includes(currentTheme)) {
+		nextMode = 'day';
 	} else {
-		vscode.window.showInformationMessage('Theme is not set to light or dark');
-		vscode.workspace.getConfiguration('workbench').update('colorTheme', lightTheme);
-		vscode.window.showInformationMessage('Theme set to light');
+		nextMode = getModeForNow(new Date()) === 'day' ? 'night' : 'day';
+	}
+
+	await applyThemeForMode(nextMode);
+}
+
+// Derive current mode from local hour boundaries.
+function getModeForNow(now: Date): ThemeMode {
+	const currentHour = now.getHours();
+	return currentHour >= DAY_START_HOUR && currentHour < NIGHT_START_HOUR ? 'day' : 'night';
+}
+
+// Pick day/night theme deterministically for the current date.
+function pickThemeForMode(mode: ThemeMode, now: Date, config: ThemeConfig): string {
+	const themes = mode === 'day' ? config.lightThemes : config.darkThemes;
+	const index = hashDayToIndex(getLocalDayKey(now), themes.length);
+	return themes[index];
+}
+
+// Disable OS color scheme auto-detection to avoid conflicts.
+async function ensureAutoDetectColorSchemeDisabled(): Promise<void> {
+	const autoDetect = configModel.getAutoDetectColorScheme();
+	if (autoDetect) {
+		await configModel.setAutoDetectColorScheme(false);
 	}
 }
 
-// This method is called when your extension is deactivated
+// Apply the chosen theme to workspace settings and refresh UI.
+async function applyThemeForMode(mode: ThemeMode): Promise<void> {
+	const now = new Date();
+	const config = configModel.getThemeConfig();
+	const theme = pickThemeForMode(mode, now, config);
+
+	await ensureAutoDetectColorSchemeDisabled();
+	await configModel.setCurrentTheme(theme);
+
+	updateStatusBar(mode, theme);
+}
+
+// Show current mode/theme in the status bar.
+function updateStatusBar(mode: ThemeMode, theme: string): void {
+	const modeLabel = mode === 'day' ? 'Day' : 'Night';
+	statusBarItem.text = `$(light-bulb) ${modeLabel}: ${theme}`;
+	statusBarItem.tooltip = `Current ${modeLabel.toLowerCase()} theme: ${theme}. Click to toggle.`;
+}
+
+// No async cleanup required on deactivation.
 export function deactivate() {}

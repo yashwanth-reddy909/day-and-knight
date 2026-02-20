@@ -21,7 +21,32 @@
         "command": "day-and-knight.toggle",
         "title": "Toggle"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Day and Knight",
+      "properties": {
+        "day-and-knight.light-themes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "Default Light+"
+          ],
+          "description": "Light themes to use during daytime."
+        },
+        "day-and-knight.dark-themes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "Default Dark+"
+          ],
+          "description": "Dark themes to use during nighttime."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
