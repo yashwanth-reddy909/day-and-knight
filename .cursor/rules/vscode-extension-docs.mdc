@@ -1,0 +1,13 @@
+---
+description: VS Code extension docs distilled for this project
+alwaysApply: true
+---
+
+# VS Code Docs - Relevant Rules
+
+- Activation should be demand-driven (commands/events), avoid `"*"` unless necessary.
+- Register commands in `activate()` and push disposables to `context.subscriptions`.
+- Contribute user settings in `package.json` with `contributes.configuration`.
+- Read config using `vscode.workspace.getConfiguration(...)`; default scope is `window` if unspecified.
+- For status bar: keep one concise, contextual item; avoid extra icons/colors.
+- Keep `deactivate()` for cleanup; return a Promise only when cleanup is async.
