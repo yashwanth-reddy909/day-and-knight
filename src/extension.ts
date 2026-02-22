@@ -1,68 +1,68 @@
 import * as vscode from 'vscode';
-import { ConfigModel, type ThemeConfig } from './models/config-model';
+import { ConfigModel } from './models/config-model';
 import { hashDayToIndex, getLocalDayKey } from './util';
+import { initializeLogger, log } from './logger/main';
 
-let statusBarItem: vscode.StatusBarItem;
+const Commands = {
+	TOGGLE: 'day-and-knight.toggle',
+	ENABLE_AUTO_UPDATE: 'day-and-knight.enableAutoUpdate',
+	DISABLE_AUTO_UPDATE: 'day-and-knight.disableAutoUpdate',
+};
+
 type ThemeMode = 'day' | 'night';
 const configModel = new ConfigModel();
 
-// Local hour when day mode starts (inclusive).
+
+let statusBarItem: vscode.StatusBarItem;
+let runInterval: NodeJS.Timeout | undefined = undefined;
+
+const CHECK_INTERVAL_MS = 1000 * 60 * 1;
 const DAY_START_HOUR = 6;
-// Local hour when night mode starts (exclusive upper bound for day).
 const NIGHT_START_HOUR = 18;
 
+
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-	console.log('Congratulations, your extension "day-and-knight" is now active!');
+	initializeLogger(context);
+	const dayNightConfig = configModel.getDayKnightConfig();
+	log(`Extension "day-and-knight" 🌙 is now running! Auto update: ${dayNightConfig.autoUpdate}`);
 
-	const disposable = vscode.commands.registerCommand('day-and-knight.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello from day-and-knight!');
-	});
-	context.subscriptions.push(disposable);
-
-	const toggleCommandId = 'day-and-knight.toggle';
-	const toggleCommand = vscode.commands.registerCommand(toggleCommandId, async () => {
-		await toggleTheme();
-	});
-	context.subscriptions.push(toggleCommand);
-
-	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Number.MIN_SAFE_INTEGER);
-	statusBarItem.text = '$(light-bulb) Day and Knight';
-	statusBarItem.command = toggleCommandId;
-	statusBarItem.tooltip = 'Toggle between day and night themes';
+	registerCommands(context);
+	
+	// status bar to quick toggle
+	statusBarItem = initializeStatusBarItem(Commands.TOGGLE);
 	statusBarItem.show();
 	context.subscriptions.push(statusBarItem);
 
-	await applyThemeForMode(getModeForNow(new Date()));
-}
-
-// Switch between day/night theme using on status bar click.
-async function toggleTheme(): Promise<void> {
-	const config = configModel.getThemeConfig();
-	const currentTheme = configModel.getCurrentTheme();
-
-	let nextMode: ThemeMode;
-	if (config.lightThemes.includes(currentTheme)) {
-		nextMode = 'night';
-	} else if (config.darkThemes.includes(currentTheme)) {
-		nextMode = 'day';
-	} else {
-		nextMode = getModeForNow(new Date()) === 'day' ? 'night' : 'day';
+	// Apply theme once at startup, then optionally continue auto updates.
+	if (dayNightConfig.autoUpdate) {
+		void enableAutoUpdate(context);
 	}
-
-	await applyThemeForMode(nextMode);
 }
 
-// Derive current mode from local hour boundaries.
-function getModeForNow(now: Date): ThemeMode {
-	const currentHour = now.getHours();
-	return currentHour >= DAY_START_HOUR && currentHour < NIGHT_START_HOUR ? 'day' : 'night';
+function registerCommands(context: vscode.ExtensionContext): void {
+	const toggleDisposable = vscode.commands.registerCommand(Commands.TOGGLE, () => {
+		void toggleTheme();
+	});
+	context.subscriptions.push(toggleDisposable);
+
+	const enableAutoUpdateDisposable = vscode.commands.registerCommand(Commands.ENABLE_AUTO_UPDATE, () => {
+		void enableAutoUpdate(context);
+	});
+	context.subscriptions.push(enableAutoUpdateDisposable);
+
+	const disableAutoUpdateDisposable = vscode.commands.registerCommand(Commands.DISABLE_AUTO_UPDATE, () => {
+		void disableAutoUpdate();
+	});
+	context.subscriptions.push(disableAutoUpdateDisposable);
 }
 
-// Pick day/night theme deterministically for the current date.
-function pickThemeForMode(mode: ThemeMode, now: Date, config: ThemeConfig): string {
-	const themes = mode === 'day' ? config.lightThemes : config.darkThemes;
-	const index = hashDayToIndex(getLocalDayKey(now), themes.length);
-	return themes[index];
+// create a status bar item to show the current theme
+function initializeStatusBarItem(command: string): vscode.StatusBarItem {
+	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Number.MIN_SAFE_INTEGER);
+	statusBarItem.text = '$(light-bulb) Day and Knight';
+	statusBarItem.command = command;
+	statusBarItem.tooltip = 'Toggle between day and night themes';
+	return statusBarItem;
 }
 
 // Disable OS color scheme auto-detection to avoid conflicts.
@@ -73,14 +73,85 @@ async function ensureAutoDetectColorSchemeDisabled(): Promise<void> {
 	}
 }
 
+// Enable auto update - set autoUpdate to true and start the interval
+// Run applyThemeForMode once at the invocation and then every CHECK_INTERVAL_MS
+async function enableAutoUpdate(context: vscode.ExtensionContext): Promise<void> {
+	await configModel.setAutoUpdate(true);
+
+	// already running - do nothing
+	if (runInterval) {
+		log(`Auto update already enabled`);
+		return;
+	}
+
+	await applyThemeForMode(getAutoMode());
+	// start auto update every CHECK_INTERVAL_MS
+	runInterval = setInterval(() => {
+		void applyThemeForMode(getAutoMode());
+	}, CHECK_INTERVAL_MS);
+
+	log(`Auto update enabled`);
+	// cleanup the interval on extension deactivation
+	context.subscriptions.push(new vscode.Disposable(() => clearInterval(runInterval)));
+}
+
+// Disable auto update - set autoUpdate to false and clear the interval
+async function disableAutoUpdate(): Promise<void> {
+	await configModel.setAutoUpdate(false);
+	if (runInterval) {
+		clearInterval(runInterval);
+		runInterval = undefined;
+		log(`Auto update disabled`);
+	} else {
+		log(`Auto update already disabled`);
+	}
+}
+
+// Switch between day/night theme using on status bar click.
+async function toggleTheme(): Promise<void> {
+	await disableAutoUpdate();
+	const config = configModel.getDayKnightConfig();
+
+	const currentTheme = configModel.getCurrentTheme();
+
+	let nextMode: ThemeMode;
+	if (config.lightThemes.includes(currentTheme)) {
+		nextMode = 'night';
+	} else if (config.darkThemes.includes(currentTheme)) {
+		nextMode = 'day';
+	} else {
+		nextMode = getAutoMode() === 'day' ? 'night' : 'day';
+	}
+
+	await applyThemeForMode(nextMode);
+}
+
+// Get the mode based on the local time
+function getAutoMode(): ThemeMode {
+	const now = new Date();
+	const currentHour = now.getHours();
+	return currentHour >= DAY_START_HOUR && currentHour < NIGHT_START_HOUR ? 'day' : 'night';
+}
+
 // Apply the chosen theme to workspace settings and refresh UI.
 async function applyThemeForMode(mode: ThemeMode): Promise<void> {
 	const now = new Date();
-	const config = configModel.getThemeConfig();
-	const theme = pickThemeForMode(mode, now, config);
+	const config = configModel.getDayKnightConfig();
 
+	// randomize the theme from the list of themes for the given mode
+	// use the hash of the local day - to be consistent for the day
+	const availableThemes = mode === 'day' ? config.lightThemes : config.darkThemes;
+	const index = hashDayToIndex(getLocalDayKey(now), availableThemes.length);
+	const theme = availableThemes[index];
+
+	// since vs code ve 1.42.0 automatically changing the theme based on OS
+	// need to disable auto detect color scheme to avoid conflicts
 	await ensureAutoDetectColorSchemeDisabled();
-	await configModel.setCurrentTheme(theme);
+
+	const currentTheme = configModel.getCurrentTheme();
+	if (currentTheme !== theme) {
+		await configModel.setCurrentTheme(theme);
+	}
 
 	updateStatusBar(mode, theme);
 }

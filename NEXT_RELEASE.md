@@ -7,12 +7,11 @@ Single source of truth for items to ship in the upcoming release.
 ## Core Features
 
 - [ ] Extension activation on startup
-- [ ] Settings: `day-and-knight.light-themes` (array), `day-and-knight.dark-themes` (array)
-- [ ] Settings: `day-and-knight.dayStart`, `day-and-knight.nightStart` (e.g. `"06:00"`, `"18:00"`)
+- [ ] Settings: `day-and-knight.lightThemes` (array), `day-and-knight.darkThemes` (array)
+- [ ] Settings: `day-and-knight.autoUpdate` (boolean)
 - [ ] Time-based day/night detection (local time)
 - [ ] Random theme selection from configured arrays on switch
-- [ ] Apply theme via `workbench.colorTheme`
-- [ ] Interval/scheduler for periodic checks (`day-and-knight.intervalMinutes`)
+- [ ] Apply theme via `workbench.colorTheme` with `window.autoDetectColorScheme: false`
 
 ## Status Bar
 

@@ -25,12 +25,9 @@
 
 ```json
 {
-  "window.autoDetectColorScheme": false,
-  "day-and-knight.light-themes": ["One Light", "GitHub Light"],
-  "day-and-knight.dark-themes": ["One Dark Pro", "Dracula"],
-  "day-and-knight.timezone": "UTC+05:30",
-  "day-and-knight.dayStart": "06:00",
-  "day-and-knight.nightStart": "18:00"
+  "day-and-knight.lightThemes": ["One Light", "GitHub Light"],
+  "day-and-knight.darkThemes": ["One Dark Pro", "Dracula"],
+  "day-and-knight.autoUpdate": true
 }
 ```
 
@@ -38,8 +35,9 @@
 
 ## Features
 
-- [ ] Toggle day/night theme (status bar + command)
-- [ ] Direct theme switching based on configured timezone
+- [x] Toggle day/night theme (status bar + command)
+- [x] Direct theme switching based on configured timezone
 - [ ] Timezone: `UTC+/-XX` or `UTC+/-XX:XX`
-- [ ] Random theme selection from `light-themes` / `dark-themes` arrays
-- [ ] Periodic check + apply `workbench.colorTheme`
+- [x] Random theme selection from `lightThemes` / `darkThemes` arrays
+- [x] Periodic check + apply `workbench.colorTheme`
+- [x] Auto update: `day-and-knight.autoUpdate`

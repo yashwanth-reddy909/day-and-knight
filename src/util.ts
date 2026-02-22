@@ -16,4 +16,16 @@ function hashDayToIndex(dayKey: string, length: number): number {
 	return hash % length;
 }
 
-export { hashDayToIndex, getLocalDayKey };
+// Sanitize the themes array to ensure it is an array of strings and is not empty.
+function sanitizeThemes(value: unknown, fallbackTheme: string): string[] {
+	if (!Array.isArray(value)) {
+		return [fallbackTheme];
+	}
+
+	const sanitized = value.filter(
+		(entry): entry is string => typeof entry === 'string' && entry.trim().length > 0
+	);
+	return sanitized.length > 0 ? sanitized : [fallbackTheme];
+}
+
+export { hashDayToIndex, getLocalDayKey, sanitizeThemes };
