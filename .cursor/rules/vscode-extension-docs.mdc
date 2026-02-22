@@ -11,3 +11,4 @@ alwaysApply: true
 - Read config using `vscode.workspace.getConfiguration(...)`; default scope is `window` if unspecified.
 - For status bar: keep one concise, contextual item; avoid extra icons/colors.
 - Keep `deactivate()` for cleanup; return a Promise only when cleanup is async.
+- Define all defaults and constants in a single location to enable easy maintenance and future configurable defaults.

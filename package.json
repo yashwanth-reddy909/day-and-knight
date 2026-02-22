@@ -14,14 +14,48 @@
   "contributes": {
     "commands": [
       {
-        "command": "day-and-knight.helloWorld",
-        "title": "Hello World"
+        "command": "day-and-knight.toggle",
+        "title": "Day and Knight: Toggle Theme"
       },
       {
-        "command": "day-and-knight.toggle",
-        "title": "Toggle"
+        "command": "day-and-knight.enableAutoUpdate",
+        "title": "Day and Knight: Enable Auto Update"
+      },
+      {
+        "command": "day-and-knight.disableAutoUpdate",
+        "title": "Day and Knight: Disable Auto Update"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Day and Knight",
+      "properties": {
+        "day-and-knight.autoUpdate": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable automatic theme updates."
+        },
+        "day-and-knight.lightThemes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "Default Light+"
+          ],
+          "description": "Light themes to use during daytime."
+        },
+        "day-and-knight.darkThemes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "Default Dark+"
+          ],
+          "description": "Dark themes to use during nighttime."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
