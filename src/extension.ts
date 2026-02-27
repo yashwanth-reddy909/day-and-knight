@@ -5,6 +5,8 @@ import { initializeLogger, log } from "./logger/main";
 
 const Commands = {
   TOGGLE: "day-and-knight.toggle",
+  TOGGLE_TO_DAY_THEME: "day-and-knight.toggleToDayTheme",
+  TOGGLE_TO_NIGHT_THEME: "day-and-knight.toggleToNightTheme",
   ENABLE_AUTO_UPDATE: "day-and-knight.enableAutoUpdate",
   DISABLE_AUTO_UPDATE: "day-and-knight.disableAutoUpdate",
 };
@@ -42,6 +44,22 @@ function registerCommands(context: vscode.ExtensionContext): void {
     void toggleTheme();
   });
   context.subscriptions.push(toggleDisposable);
+
+  const toggleToDayThemeDisposable = vscode.commands.registerCommand(
+    Commands.TOGGLE_TO_DAY_THEME,
+    () => {
+      void toggleToDayTheme();
+    },
+  );
+  context.subscriptions.push(toggleToDayThemeDisposable);
+
+  const toggleToNightThemeDisposable = vscode.commands.registerCommand(
+    Commands.TOGGLE_TO_NIGHT_THEME,
+    () => {
+      void toggleToNightTheme();
+    },
+  );
+  context.subscriptions.push(toggleToNightThemeDisposable);
 
   const enableAutoUpdateDisposable = vscode.commands.registerCommand(
     Commands.ENABLE_AUTO_UPDATE,
@@ -131,6 +149,18 @@ async function toggleTheme(): Promise<void> {
   }
 
   await applyThemeForMode(nextMode);
+}
+
+// Switch directly to day theme from command palette.
+async function toggleToDayTheme(): Promise<void> {
+  await disableAutoUpdate();
+  await applyThemeForMode("day");
+}
+
+// Switch directly to night theme from command palette.
+async function toggleToNightTheme(): Promise<void> {
+  await disableAutoUpdate();
+  await applyThemeForMode("night");
 }
 
 // Get the mode based on the local time
