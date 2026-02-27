@@ -1,71 +1,72 @@
-# day-and-knight README
+# Day and Knight
 
-This is the README for your extension "day-and-knight". After writing up a brief description, we recommend including the following sections.
+A **VS Code extension** that automatically switches your editor theme between day and night.
 
-## Features
+It supports:
+- **Auto update theme** based on local time
+- Random theme selection from your configured lists
+- Consistent per-day theme choice (same theme for the whole day)
+- One-click manual toggle from the status bar
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## Why use this extension
 
-For example if there is an image subfolder under your extension project workspace:
+`day-and-knight` helps you keep your editor comfortable through the day:
+- Day mode runs from **06:00 to 17:59**
+- Night mode runs from **18:00 to 05:59**
+- Themes are chosen from your own theme arrays
 
-\!\[feature X\]\(images/feature-x.png\)
+## Quick setup
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+1. Install the extension in **VS Code**.
+2. Open your workspace `settings.json`.
+3. Add your light/dark theme lists and keep auto update enabled.
 
-## Requirements
+Sample config:
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+```json
+{
+  "day-and-knight.autoUpdate": true,
+  "day-and-knight.lightThemes": ["Default Light+", "GitHub Light", "Solarized Light"],
+  "day-and-knight.darkThemes": ["Default Dark+", "One Dark Pro", "Dracula"]
+}
+```
 
-## Extension Settings
+## Commands
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+- `Day and Knight: Toggle Theme`
+- `Day and Knight: Toggle to Day Theme ☀️`
+- `Day and Knight: Toggle to Night Theme 🌙`
+- `Day and Knight: Enable Auto Update`
+- `Day and Knight: Disable Auto Update`
 
-For example:
+## Important behavior
 
-This extension contributes the following settings:
+- Clicking the status bar toggle (or running **Toggle Theme**) will:
+  - switch to the opposite mode theme
+  - **disable auto update**
+- To resume automatic switching, you must manually run:
+  - `Day and Knight: Enable Auto Update`
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## How random selection works
 
-## Known Issues
+Theme selection is random **but stable for each local day**:
+- A hash is computed from the day string (`YYYY-MM-DD`)
+- That hash picks an index from your theme array
+- Result: you get consistency throughout a day, and natural variation across days
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+## Extension settings
 
-## Release Notes
+- `day-and-knight.autoUpdate` (boolean, default: `true`)
+- `day-and-knight.lightThemes` (string array, default: `["Default Light+"]`)
+- `day-and-knight.darkThemes` (string array, default: `["Default Dark+"]`)
 
-Users appreciate release notes as you update your extension.
+## Notes
 
-### 1.0.0
+- This extension writes the selected theme to `workbench.colorTheme`.
+- It disables `window.autoDetectColorScheme` to avoid OS-level theme overrides.
+- Auto update checks and reapplies mode every minute.
+- If a theme list is empty/invalid, a safe fallback is used (`Default Light+` / `Default Dark+`).
 
-Initial release of ...
+## Release notes
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+See `RELEASE_v0.0.1.md` for the v0.0.1 release details.
