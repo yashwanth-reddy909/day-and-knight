@@ -34,6 +34,8 @@ Sample config:
 ## Commands
 
 - `Day and Knight: Toggle Theme`
+- `Day and Knight: Toggle to Day Theme ☀️`
+- `Day and Knight: Toggle to Night Theme 🌙`
 - `Day and Knight: Enable Auto Update`
 - `Day and Knight: Disable Auto Update`
 
