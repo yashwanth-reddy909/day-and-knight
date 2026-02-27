@@ -2,6 +2,8 @@
   "name": "day-and-knight",
   "displayName": "day-and-knight",
   "description": "Automatically switch to dark mode at sunset",
+  "repository": "https://github.com/yashwanth-reddy909/day-and-knight",
+  "publisher": "yrv-publishes",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.109.0"
