@@ -20,6 +20,14 @@
         "title": "Day and Knight: Toggle Theme"
       },
       {
+        "command": "day-and-knight.toggleToDayTheme",
+        "title": "Day and Knight: Toggle to Day Theme ☀️"
+      },
+      {
+        "command": "day-and-knight.toggleToNightTheme",
+        "title": "Day and Knight: Toggle to Night Theme 🌙"
+      },
+      {
         "command": "day-and-knight.enableAutoUpdate",
         "title": "Day and Knight: Enable Auto Update"
       },
