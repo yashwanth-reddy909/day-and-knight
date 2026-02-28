@@ -64,9 +64,5 @@ Theme selection is random **but stable for each local day**:
 
 - This extension writes the selected theme to `workbench.colorTheme`.
 - It disables `window.autoDetectColorScheme` to avoid OS-level theme overrides.
-- Auto update checks and reapplies mode every minute.
+- Refresh interval is 1 minute
 - If a theme list is empty/invalid, a safe fallback is used (`Default Light+` / `Default Dark+`).
-
-## Release notes
-
-See `RELEASE_v0.0.1.md` for the v0.0.1 release details.

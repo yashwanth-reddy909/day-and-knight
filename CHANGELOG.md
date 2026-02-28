@@ -4,7 +4,19 @@ All notable changes to the "day-and-knight" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.0.3] - 2026-03-01
+
+### Updated
+
+- README updates
+- VS Code extension image size reduction
+
+## [0.0.2] - 2026-03-01
+
+### Added
+
+- VS Code extension icon
+- Changelog.md
 
 ## [0.0.1] - 2025-02-28
 
