@@ -24,8 +24,6 @@ jobs:
       - name: Validate changelog contains tag version
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
-          echo "REF_NAME: $GITHUB_REF_NAME"
-          echo "TAG_VERSION: $TAG_VERSION"
           node -e '
             const fs = require("fs");
             const tagVersion = process.argv[1];
