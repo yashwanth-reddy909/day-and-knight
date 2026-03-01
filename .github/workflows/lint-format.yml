@@ -15,18 +15,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.14.0
+          node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
         run: |
-          npm install --package-lock-only --ignore-scripts
-          if ! git diff --quiet -- package-lock.json; then
-            echo "::error title=Out-of-sync lockfile::package.json and package-lock.json are out of sync. Run 'npm install' locally and commit package-lock.json."
-            git --no-pager diff -- package-lock.json
+          npm -v
+          node -v
+          if ! npm ci; then
+            echo "::error title=Out-of-sync lockfile::npm ci failed. package.json and package-lock.json may be out of sync. Run 'npm install' locally and commit package-lock.json."
             exit 1
           fi
-
+      
       - name: Run linter
         run: npm run lint
 
