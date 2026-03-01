@@ -10,19 +10,28 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
 
       - name: Install dependencies
         run: |
+          set -euo pipefail
           npm -v
           node -v
-          npm ci
+          if ! npm ci --verbose; then
+            echo "npm ci failed. Dumping npm debug logs..."
+            ls -la /home/runner/.npm/_logs || true
+            latest_log="$(ls -t /home/runner/.npm/_logs/*-debug-0.log 2>/dev/null | head -n 1 || true)"
+            if [ -n "${latest_log}" ]; then
+              sed -n '1,220p' "${latest_log}" || true
+            fi
+            exit 1
+          fi
       
       - name: Run linter
         run: npm run lint
