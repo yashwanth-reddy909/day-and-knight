@@ -18,15 +18,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Validate changelog contains tag version
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           node -e '
             const fs = require("fs");
-            const tagVersion = process.env.TAG_VERSION;
+            const tagVersion = process.argv[1];
             const changelog = fs.readFileSync("CHANGELOG.md", "utf8");
             const lines = changelog.split(/\r?\n/);
             const hasVersionHeading = lines.some((line) =>
@@ -38,7 +41,7 @@ jobs:
               );
               process.exit(1);
             }
-          '
+          ' "$TAG_VERSION"
 
       - name: Publish to VS Code Marketplace
         run: |
