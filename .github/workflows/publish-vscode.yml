@@ -20,13 +20,16 @@ jobs:
         with:
           node-version: 22
           cache: npm
+    
+      - name: Install dependencies
+        run: npm install
 
       - name: Validate changelog contains tag version
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           node -e '
             const fs = require("fs");
-            const tagVersion = process.env.TAG_VERSION;
+            const tagVersion = process.argv[1];
             const changelog = fs.readFileSync("CHANGELOG.md", "utf8");
             const lines = changelog.split(/\r?\n/);
             const hasVersionHeading = lines.some((line) =>
@@ -38,9 +41,21 @@ jobs:
               );
               process.exit(1);
             }
-          '
+          ' "$TAG_VERSION"
+      - name: Validate package.json version matches tag
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          node -e '
+            const pkg = require("./package.json");
+            const tagVersion = process.argv[1];
+            if (pkg.version !== tagVersion) {
+              console.error(
+                `package.json version (${pkg.version}) does not match tag version (${tagVersion}).`
+              );
+              process.exit(1);
+            }
+          ' "$TAG_VERSION"
 
       - name: Publish to VS Code Marketplace
         run: |
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          npx @vscode/vsce publish "$TAG_VERSION" --pat "${{ secrets.VSCODE_PUBLISHER_TOKEN }}"
+          npx @vscode/vsce publish --pat "${{ secrets.VSCODE_PUBLISHER_TOKEN }}"

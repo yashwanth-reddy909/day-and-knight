@@ -4,6 +4,12 @@ All notable changes to the "day-and-knight" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.4] - 2026-03-02
+
+### Added
+
+- Workflow to publish to VS Code Marketplace
+
 ## [0.0.3] - 2026-03-01
 
 ### Updated
