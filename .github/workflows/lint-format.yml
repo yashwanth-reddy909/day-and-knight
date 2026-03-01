@@ -22,10 +22,7 @@ jobs:
         run: |
           npm -v
           node -v
-          if ! npm ci; then
-            echo "::error title=Out-of-sync lockfile::npm ci failed. package.json and package-lock.json may be out of sync. Run 'npm install' locally and commit package-lock.json."
-            exit 1
-          fi
+          npm ci
       
       - name: Run linter
         run: npm run lint
